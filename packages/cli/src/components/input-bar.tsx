@@ -7,6 +7,8 @@ import { useRenderer } from "@opentui/react";
 import { resolve } from "bun";
 import { useCommandMenu } from "../command-menu/use-command-menu";
 import type { Command } from "../command-menu/types";
+import { useToast } from "../providers/toast";
+import { useKeyboardLayer } from "../providers/keyboard-layer";
 
 type Props = {
     onSubmit: (text: string) => void;
@@ -25,6 +27,8 @@ export function InputBar({ onSubmit, disabled = false} : Props) {
     const textareaRef = useRef<TextareaRenderable>(null)
     const onSubmitRef = useRef<() => void>(() => {})
     const renderer = useRenderer()
+    const toast = useToast()
+    const {isTopLayer, setResponder} = useKeyboardLayer()
 
     const {
         showCommandMenu,
@@ -63,12 +67,13 @@ export function InputBar({ onSubmit, disabled = false} : Props) {
         textarea.setText("")
         if(command.action) {
             command.action({
-                exit: () => renderer.destroy()
+                exit: () => renderer.destroy(),
+                toast,
             })
         } else {
             textarea.insertText(command.value+" ")
         }
-    }, [renderer])
+    }, [renderer, toast])
 
     const handleCommandExecute = useCallback((
         index: number
@@ -98,6 +103,20 @@ export function InputBar({ onSubmit, disabled = false} : Props) {
         handleSubmit()
     }
 
+    useEffect(() => {
+        setResponder("base", () => {
+            if(disabled) return false
+            const textarea = textareaRef.current
+            if(textarea && textarea.plainText.length > 0) {
+                textarea.setText("")
+                return true
+            }
+            return false
+        })
+
+        return () => setResponder("base", null)
+    }, [disabled, setResponder])
+
     return(
         <box width="100%" alignItems="center" paddingY={1}>
             <box border={["left", "right"]} borderStyle="heavy" borderColor="purple" width="100%" >
@@ -107,7 +126,7 @@ export function InputBar({ onSubmit, disabled = false} : Props) {
                             <CommandMenu query={commandQuery} selectedIndex={selectedIndex} scrollRef={scrollRef} onSelect={setSelectedIndex} onExecute={handleCommandExecute} />
                         </box>
                     )}
-                    <textarea ref={textareaRef} onContentChange={handleTextareaContentChange} keyBindings={TEXTAREA_KEY_BINDINGS} focused={!disabled} placeholder={`Ask anything... "Refactor the authentication"`} />
+                    <textarea ref={textareaRef} onContentChange={handleTextareaContentChange} keyBindings={TEXTAREA_KEY_BINDINGS} focused={!disabled && (isTopLayer("base") || isTopLayer("command"))} placeholder={`Ask anything... "Refactor the authentication"`} />
                     <StatusBar />
                 </box>
             </box>
