@@ -18,6 +18,12 @@ export const COMMANDS: Command[] = [
         name: "models",
         description: "Select a different AI model",
         value: "/models",
+        action: (ctx) => {
+            ctx.dialog.open({
+                title: "Select Model",
+                children: <text>Model selection not implemented yet...</text>
+            })
+        }
     },
     {
         name: "sessions",
