@@ -2,7 +2,7 @@ import { findSupportedChatModel } from "@astracode/shared"
 import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
 import z from "zod"
-import {db} from "@astracode/database"
+import {db} from "@astracode/database/client"
 import {Mode, Role, MessageStatus} from "@astracode/database/enums"
 
 
