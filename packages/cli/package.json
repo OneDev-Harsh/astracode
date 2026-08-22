@@ -8,15 +8,19 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "@types/react": "19"
+    "@types/react": "19",
+    "@astracode/server": "workspace:*"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "@astracode/shared": "workspace:*",
     "@opentui/core": "^0.5.1",
     "@opentui/react": "^0.5.1",
+    "hono": "^4.13.3",
     "react": "^19.2.6",
-    "react-router": "^8.3.0"
+    "react-router": "^8.3.0",
+    "zod": "^4.4.3"
   }
 }
